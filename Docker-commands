@@ -1,0 +1,47 @@
+Install Docker on my machine.
+
+Create a directory for my Kafka and Zookeeper configuration files:
+mkdir kafka-zookeeper
+cd kafka-zookeeper
+
+Create a docker-compose.yml file in the directory with the following content:
+version: '2'
+
+networks:
+  kafka-net:
+
+services:
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    networks:
+      - kafka-net
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  kafka:
+    image: 'bitnami/kafka:latest'
+    networks:
+      - kafka-net
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+
+I Saved the file and start the cluster using the following command:
+docker-compose up -d
+
+Then a Zookeeper instance and a Kafka instance using the Bitnami images were started. The following messages showed on my terminal:
+[+] Running 2/2
+ - zookeeper Pulled                                                                                               66.4s
+   - e8cb6d66fc4d Pull complete                                                                                   62.8s
+[+] Running 3/3
+ - Network kafka-zookeeper_kafka-net      Created                                                                  0.2s
+ - Container kafka-zookeeper-zookeeper-1  Started                                                                 17.4s
+ - Container kafka-zookeeper-kafka-1      Started
+
+To check if the cluster is running properly, I use the following command to list the running containers:
+docker ps
+
+It shows the below:
+CONTAINER ID   IMAGE                      COMMAND                  CREATED         STATUS         PORTS                                    NAMES
+f557de2f2b77   bitnami/zookeeper:latest   "/opt/bitnami/script…"   7 minutes ago   Up 6 minutes   2181/tcp, 2888/tcp, 3888/tcp, 8080/tcp   kafka-zookeeper-zookeeper-1
+531a83c56737   bitnami/kafka:latest       "/opt/bitnami/script…"   7 minutes ago   Up 6 minutes   9092/tcp                                 kafka-zookeeper-kafka-1
